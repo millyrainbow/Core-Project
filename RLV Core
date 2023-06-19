@@ -1,0 +1,782 @@
+///////////////////////////////////////////////////////////////
+/////////////////////////RLV CORE//////////////////////////////
+////////////////////FOR <Insert here>//////////////////////////
+///////////////////////////////////////////////////////////////
+//                 Coded by Emily Mewens                     //
+///////////////////////////////////////////////////////////////
+
+string sGroup = "Example Group Name";
+//This is the group tag used to talk with all other scripts in the same group. Make sure they all have the same group tag
+string sCoreName = "Example Core Name";
+//this is what you want your core to be referred to in ownersay and say
+string sCall1 = "example call name";
+string sCall1C = "Example call name";
+string sCall2 = "example call2";
+string sCall3 = "example call3";
+//These are various calls used in the menus and various says when referring to you. sCall1C is for capital letterings cause im lazy.
+string sPro1    =   "example pronoun for it";
+string sPro2    =   "example pronoun for its";
+//These are for pronouns. Pro1 is for it, he, her, them. Pro2 is for its, his, hers, their.
+
+string sbimbo = "Insert Default Name Here";
+//What your default display name will be set to.
+
+string MEN_BLANK    = " ";
+//---------------------------------------------//
+//Overly Complex system to add the correct number
+//of blank spots to a menu
+list AddBlank(list lst)
+{
+    list templist;
+    integer num = llGetListLength(lst)%3;
+
+    if     (num == 1){templist += [MEN_BLANK,MEN_BLANK];}
+    else if(num == 2){templist += [MEN_BLANK];}
+
+    list bset1 = llList2List(lst,0,2 );
+    list bset2 = llList2List(lst,3,5 );
+    list bset3 = llList2List(lst,6,8 );
+    list bset4 = llList2List(lst,9,11);
+
+    if     (bset2 == []){return bset1+templist;}
+    else if(bset3 == []){return bset2+templist+bset1;}
+    else if(bset4 == []){return bset3+templist+bset2+bset1;}
+    else                {return bset4+templist+bset3+bset2+bset1;}
+}
+
+string Core(integer bool){
+    if(bool)return"BunnyCo";
+    else return sCoreName;
+}
+string rlvYN(integer bool){
+    if(bool)return"n";
+    else return"y";
+}
+string TogP(integer bool){
+    if(bool)return"*Prevented*";
+    else return"Allowed";
+}
+string TogH(integer bool){
+    if(bool)return"*Hidden*";
+    else return"Allowed";
+}
+string TogL(integer bool){
+    if(bool)return"*Locked*";
+    else return"Unlocked";
+}
+string TogT(integer bool){
+    if(bool)return"*Blocked*";
+    else return"Allowed";
+}
+string TogBL(integer Tog){
+    if(Tog==1)return"-Light-";
+    if(Tog==2)return"*Heavy*";
+    else return"Disabled";
+}
+string blRLV(integer Tog){
+    if(Tog==1)return"setsphere=n,setsphere_distmin:1=force,setsphere_distmax:15=force,setsphere_valuemin:0=force";
+    if(Tog==2)return"setsphere=n,setsphere_distmin:1=force,setsphere_distmax:4=force,setsphere_valuemin:0=force";
+    else return"@clear=camdistmax,setsphere=y";
+}
+string blRLV2(integer Tog){
+    if(Tog==1)return"camdistmax:15=n";
+    if(Tog==2)return"camdistmax:4=n";
+    else return"clear=camdistmax";
+}
+Say1(string sSay1)
+{
+    string ObjectName = llGetObjectName();
+    llSetObjectName(Core(iCore));
+    llSay(0,sSay1);
+    llSetObjectName(ObjectName);
+}
+OSay1(string sOSay1)
+{
+    string ObjectName = llGetObjectName();
+    llSetObjectName("BunnyCo");
+    llOwnerSay(sOSay1);
+    llSetObjectName(ObjectName);
+}
+integer iCore;
+
+Say2(string sSay2)
+{
+    string ObjectName = llGetObjectName();
+    llSetObjectName(sRenamer);
+    llSay(0,sSay2);
+    llSetObjectName(ObjectName);
+}
+SayLong(string message){
+    while(llStringLength(message) > 0){
+        Say2(llGetSubString(message,0,750));
+        message = llDeleteSubString(message,0,750);
+    }
+}
+updateRLV1(){
+    llOwnerSay("@shownames="+(string)rlvYN(iNames)+",fly="+(string)rlvYN(iFly)+",temprun="+(string)rlvYN(iRun)+",alwaysrun="+(string)rlvYN(iRun)+",edit="+(string)rlvYN(iEdit)+",rez="+(string)rlvYN(iRez)+",showinv="+(string)rlvYN(iInv)+",viewnote="+(string)rlvYN(iNotes)+",viewscript="+(string)rlvYN(iScrip)+",viewtexture="+(string)rlvYN(iTxt));
+}
+updateRLV2(){
+    llOwnerSay("@fartouch="+(string)rlvYN(iFar)+",touchworld="+(string)rlvYN(iWorld)+",touchattachself="+(string)rlvYN(iSelf)+",touchattachother="+(string)rlvYN(iOthers)+",addattach="+(string)rlvYN(iOutfit)+",remattach="+(string)rlvYN(iOutfit)+",addoutfit="+(string)rlvYN(iOutfit)+",remoutfit="+(string)rlvYN(iOutfit));
+}
+updateRLV3(){
+    llOwnerSay("@tplm="+(string)rlvYN(iTPLM)+",tploc="+(string)rlvYN(iTPMap)+",tplocal="+(string)rlvYN(iTPMap)+",tplure="+(string)rlvYN(iTPInvite)+",showminimap="+(string)rlvYN(iMap)+",showworldmap="+(string)rlvYN(iMap)+",showloc="+(string)rlvYN(iShowLoc));
+}
+updateSphere(){
+    llOwnerSay("@clear=camdistmax");
+    llSleep(1);
+    llOwnerSay("@"+(string)blRLV(iBlind));
+    llOwnerSay("@"+(string)blRLV2(iBlind));
+}
+Bulk1(){
+    //iNames=1;
+    iFly=1;
+    iRun=1;
+    iEdit=1;
+    iRez=1;
+    iInv=1;
+    iNotes=1;
+    iScrip=1;
+    iTxt=1;
+    updateRLV1();
+}
+
+BasicsMenu(){
+    llDialog(Stored_ID,"Names: "+(string)TogH(iNames)+"\nFly: "+(string)TogP(iFly)+"\nRun: "+(string)TogP(iRun)+"\nEdit: "+(string)TogP(iEdit)+"\nRez: "+(string)TogP(iRez)+"\nInventory: "+(string)TogL(iInv)+"\nNotecards: "+(string)TogP(iNotes)+"\nScripts: "+(string)TogP(iScrip)+"\nTextures: "+(string)TogP(iTxt),AddBlank(Basics),iChan);
+}
+TouchMenu(){
+    llDialog(Stored_ID,"Far Touch: "+(string)TogP(iFar)+"\nWorld Touch: "+(string)TogP(iWorld)+"\nSelf Attachments Touch: "+(string)TogP(iSelf)+"\nOthers Attachments Touch: "+(string)TogP(iOthers),AddBlank(Touch),iChan);
+}
+TravelMenu(){
+    llDialog(Stored_ID,"TP:LM: "+(string)TogT(iTPLM)+"\nTP:Map: "+(string)TogT(iTPMap)+"\nTP:Invite: "+(string)TogT(iTPInvite)+"\nShow Mini/Map: "+(string)TogH(iMap)+"\nShow Location: "+(string)TogH(iShowLoc),AddBlank(Travel),iChan);
+}
+HeavyLocksMenu(){
+    llDialog(Stored_ID,"Blinder: "+(string)TogBL(iBlind)+"\nOutfit: "+(string)TogL(iOutfit)+"\n\nBlinder surrounds the "+(string)sbimbo+" with a sphere of black fog that the "+sCall2+"s camera cannot move past. It comes in 2 different modes; Light and Heavy.\nLight allows the "+(string)sbimbo+" to see about a house or so away.\nHeavy allows the "+sCall2+""+sCall2+" to see only but a couple feet away.",AddBlank(HeavyLocks),iChan);
+    //llDialog(Stored_ID,"Blinder: "+(string)TogBL(iBlind)+"\n\nBlinder surrounds the "+(string)sbimbo+" with a sphere of black fog that the "+sCall2+"s camera cannot move past. It comes in 2 different modes; Light and Heavy.\nLight allows the "+(string)sbimbo+" to see about a house or so away.\nHeavy allows the "+sCall1+" to see only but a couple feet away.",AddBlank(HeavyLocks),iChan);
+}
+SpeechMenu(){
+    llDialog(Stored_ID,"-Speech Menu-\n\nCurrent Name: "+(string)sRenamer+"\nVoice: "+(string)sVoice+"\n\nReplacer will change what text is said instead when the "+(string)sbimbo+" is muted. To totally mute "+sPro1+", just put in \"Mute\" into the textbox, and thatll silence that silly "+sCall2+" nice and good. To check to see what "+sPro2+" current replacer text is, please click 'CheckRepl'",AddBlank(Speech),iChan);
+}
+ConfirmMenu(){
+    llDialog(Stored_ID,"You have chosen to give complete control to "+(string)llGetDisplayName(Owner_ID)+"\n\nAre you certain?",AddBlank(Confirm),iChan);
+}
+///////Lists/////////
+//list RLV             =      ["Basics", "Touch", "Travel", "HeavyLocks", "Speech", " ", "RLVLockout", " ", "Back"];
+list RLV             =      ["Basics", "Touch", "Travel", "HeavyLocks", "Speech", "Back"];
+list Basics          =      ["Names", "Fly", "Run", "Edit", "Rez", "Inventory", "Notecards", "Scripts", "Textures", " ", " ", "Back"];
+list Touch           =      ["Far", "World", " ", "Self", "Others", "Back"];
+list Travel          =      ["TP:LM", "TP:Map", "TP:Invite", "Mini/Map", "ShowLoc", "Back"];
+list HeavyLocks      =      ["LightBlind", "HeavyBlind", "OutfitLock", " ", " ", "Back"];
+//list HeavyLocks      =      ["LightBlind", "HeavyBlind", " ", " ", " ", "Back"];
+list Speech          =      ["Voice", "Renamer", "Replacer", "Hovertext", " ", "CheckRepl", " ", " ", "Back"];
+list Confirm        =       ["Confirm"," ","Close"];
+
+///////Channels//////
+integer iChan;
+integer TextChan;
+integer NameChan;
+integer ReplacerChan;
+integer OwnerChan;
+integer iEmote;
+integer iChat;
+integer iBounce;
+integer chan1;
+
+integer TextListen;
+//integer EmoteListen;
+//integer ChatListen;
+
+//////RLV Integers and Strings//////
+integer iNames;
+integer iFly;
+integer iRun;
+integer iEdit;
+integer iRez;
+integer iInv;
+integer iNotes;
+integer iScrip;
+integer iTxt;
+integer iFar;
+integer iWorld;
+integer iSelf;
+integer iOthers;
+integer iTPLM;
+integer iTPMap;
+integer iTPInvite;
+integer iMap;
+integer iShowLoc;
+integer iBlind;
+integer iOutfit;
+integer iVoice;
+integer iMuted;
+integer menu;
+//Menu 0-10 = HomeCore
+//Menu 11-20 = RLVCore
+//Menu 21-30 = Hovercore
+//Menu 31-40 = Timercore
+integer textlockout;
+
+string sVoice = "Unmuted";
+string sRenamer;
+string sReplacer;
+string msg;
+
+
+
+key Stored_ID;
+key Owner_ID;
+//key Marcella = "1725939c-b807-466c-a163-b0cd447f6670";
+//key Marcella = "6198bba5-0235-40a8-b1f5-210ca3ece420";
+
+default
+{
+    state_entry()
+    {
+        llOwnerSay("@Clear");
+        OSay1("Starting up base routines for "+sCoreName+". Hold still, little "+sCall2+"♥");
+        llSleep(1);
+        updateRLV1();
+        llSleep(1);
+        updateRLV2();
+        llSleep(1);
+        updateRLV3();
+        llSleep(1);
+        updateSphere();
+        llSleep(1);
+        OSay1(sCoreName+" is fully set up. Have a nice day, little "+(string)sbimbo+"~♥");
+        chan1 = (integer) ("0x"+llGetSubString((string)llGetOwner(), -9, -3));
+        iChan = chan1+80;
+        TextChan = iChan+1;
+        NameChan = iChan+2;
+        ReplacerChan = iChan+3;
+        iEmote = iChan+4;
+        iChat = iChan+5;
+        iBounce = iChan+7;
+        OwnerChan = iChan+9;
+        llListen(iChan,"","","");
+        llListen(iEmote,"","","");
+        llListen(iChat,"","","");
+        llOwnerSay("@redirchat:"+(string)iChat+"=n");
+        llOwnerSay("@rediremote:"+(string)iEmote+"=n");
+        sRenamer="Fuck Kitten";
+        llSay(iChan,sGroup+" sRenamer "+(string)sRenamer);
+        sReplacer="Mew~♥";
+    }
+    changed(integer change)
+    {
+        if (change & CHANGED_OWNER) //note that it's & and not &&... it's bitwise!
+        {
+            llResetScript(); // needs a reset if the owner is changed to ensure that if you give it to someone else the listeners are reset.
+        }
+    }
+    on_rez(integer start_param)
+    {
+        llSleep(5);
+        OSay1("Starting up base routines for "+sCoreName+". Hold still, little "+sCall2+"♥");
+        llSleep(1);
+        updateRLV1();
+        llSleep(1);
+        updateRLV2();
+        llSleep(1);
+        updateRLV3();
+        llSleep(1);
+        updateSphere();
+        llSleep(1);
+        updateRLV1();
+        llSleep(1);
+        updateRLV2();
+        llSleep(1);
+        updateRLV3();
+        llSleep(1);
+        updateSphere();
+        llSleep(1);
+        updateRLV1();
+        llSleep(1);
+        updateRLV2();
+        llSleep(1);
+        updateRLV3();
+        llSleep(1);
+        updateSphere();
+        llSleep(1);
+        llOwnerSay("@redirchat:"+(string)iChat+"=n");
+        llOwnerSay("@rediremote:"+(string)iEmote+"=n");
+        llSleep(1);
+        menu=0;
+        OSay1(sCoreName+" is fully set up. Have a nice day, little "+(string)sbimbo+"~♥");
+    }
+    listen(integer channel, string name, key id, string message)
+    {
+        if(channel==iChan){
+            if(message=="RLV"){
+                menu=11;
+                llSay(iChan,sGroup+" menu 11");
+                llDialog(Stored_ID,"Welcome to "+sRenamer+"'s RLV Menu. Be sure to try *all* the locks♥" ,AddBlank(RLV),iChan);
+            }
+            /////////////Basics Menu/////////////
+            ////////////////////////////////////
+            else if(message=="Basics"){
+                msg=message;
+                menu=12;
+                llSay(iChan,sGroup+" menu 12");
+                BasicsMenu();
+            }
+            else if(message=="Names"){
+                if(iNames==0){
+                    iNames=1;
+                    updateRLV1();
+                }
+                else{
+                    iNames=0;
+                    updateRLV1();
+                }
+                BasicsMenu();
+            }//Fucking bloated as hell, but im ready for sleep and this works.
+
+            //Fixed that bloat hell hopefully. Why didnt i just use llsay to
+            //call up pre-existing menus instead of remaking them 80billion times DX
+
+            //Because, you didnt know about the glorious function abilitys. Now the code
+            //is WAY more streamlined, AND updates the rlv regularly! >:D
+
+            //popping in again, hi guys :D Im fucking it up more. hurray! \o/
+            else if(message=="Fly"){
+                if(iFly==0){
+                    iFly=1;
+                }
+                else{
+                    iFly=0;
+                }
+                updateRLV1();
+                BasicsMenu();
+            }
+            else if(message=="Run"){
+                if(iRun==0){
+                    iRun=1;
+                }
+                else{
+                    iRun=0;
+                }
+                updateRLV1();
+                BasicsMenu();
+            }
+            else if(message=="Edit"){
+                if(iEdit==0){
+                    iEdit=1;
+                }
+                else{
+                    iEdit=0;
+                }
+                updateRLV1();
+                BasicsMenu();
+            }
+            else if(message=="Rez"){
+                if(iRez==0){
+                    iRez=1;
+                }
+                else{
+                    iRez=0;
+                }
+                updateRLV1();
+                BasicsMenu();
+            }
+            else if(message=="Inventory"){
+                if(iInv==0){
+                    iInv=1;
+                }
+                else{
+                    iInv=0;
+                }
+                updateRLV1();
+                BasicsMenu();
+            }
+            else if(message=="Notecards"){
+                if(iNotes==0){
+                    iNotes=1;
+                }
+                else{
+                    iNotes=0;
+                }
+                updateRLV1();
+                BasicsMenu();
+            }
+            else if(message=="Scripts"){
+                if(iScrip==0){
+                    iScrip=1;
+                }
+                else{
+                    iScrip=0;
+                }
+                updateRLV1();
+                BasicsMenu();
+            }
+            else if(message=="Textures"){
+                if(iTxt==0){
+                    iTxt=1;
+                }
+                else{
+                    iTxt=0;
+                }
+                updateRLV1();
+                BasicsMenu();
+            }
+
+            ////////////Touch Menu//////////////
+            ///////////////////////////////////
+            else if(message=="Touch"){
+                msg=message;
+                menu=12;
+                llSay(iChan,sGroup+" menu 12");
+                TouchMenu();
+            }
+            else if(message=="Far"){
+                if(iFar==0){
+                    iFar=1;
+                }
+                else{
+                    iFar=0;
+                }
+                updateRLV2();
+                TouchMenu();
+            }
+            else if(message=="World"){
+                if(iWorld==0){
+                    iWorld=1;
+                }
+                else{
+                    iWorld=0;
+                }
+                updateRLV2();
+                TouchMenu();
+            }
+            else if(message=="Self"){
+                if(iSelf==0){
+                    iSelf=1;
+                }
+                else{
+                    iSelf=0;
+                }
+                updateRLV2();
+                TouchMenu();
+            }
+            else if(message=="Others"){
+                if(iOthers==0){
+                    iOthers=1;
+                }
+                else{
+                    iOthers=0;
+                }
+                updateRLV2();
+                TouchMenu();
+            }
+
+            //////////TP Menu///////////
+            ///////////////////////////
+            else if(message=="Travel"){
+                msg=message;
+                menu=12;
+                llSay(iChan,sGroup+" menu 12");
+                TravelMenu();
+            }
+            else if(message=="TP:LM"){
+                if(iTPLM==0){
+                    iTPLM=1;
+                }
+                else{
+                    iTPLM=0;
+                }
+                updateRLV3();
+                TravelMenu();
+            }
+            else if(message=="TP:Map"){
+                if(iTPMap==0){
+                    iTPMap=1;
+                }
+                else{
+                    iTPMap=0;
+                }
+                updateRLV3();
+                TravelMenu();
+            }
+            else if(message=="TP:Invite"){
+                if(iTPInvite==0){
+                    iTPInvite=1;
+                }
+                else{
+                    iTPInvite=0;
+                }
+                updateRLV3();
+                TravelMenu();
+            }
+            else if(message=="Mini/Map"){
+                if(iMap==0){
+                    iMap=1;
+                }
+                else{
+                    iMap=0;
+                }
+                updateRLV3();
+                TravelMenu();
+            }
+            else if(message=="ShowLoc"){
+                if(iShowLoc==0){
+                    iShowLoc=1;
+                }
+                else{
+                    iShowLoc=0;
+                }
+                updateRLV3();
+                TravelMenu();
+            }
+
+            //////////Heavy Locks Menu//////////
+            ///////////////////////////////////
+            else if(message=="HeavyLocks"){
+                msg=message;
+                menu=12;
+                llSay(iChan,sGroup+" menu 12");
+                HeavyLocksMenu();
+            }
+            else if(message=="LightBlind"){
+                if(iBlind==0||iBlind==2){
+                    iBlind=1;
+                }
+                else{
+                    iBlind=0;
+                }
+                updateSphere();
+                HeavyLocksMenu();
+            }
+            else if(message=="HeavyBlind"){
+                if(iBlind==0||iBlind==1){
+                    iBlind=2;
+                }
+                else{
+                    iBlind=0;
+                }
+                updateSphere();
+                HeavyLocksMenu();
+            }
+            else if(message=="OutfitLock"){
+                iCore=0;
+                if(iOutfit==0){
+                    iOutfit=1;
+                    Say1((string)sRenamer+" is now fully stuck in "+sPro2+" new form. We hope you enjoy your new body, "+(string)sRenamer+". We know we will~♥");
+                }
+                else{
+                    iOutfit=0;
+                    Say1("Caution: We are not responsible if "+(string)sRenamer+" escapes from "+sPro2+" "+(string)sbimbo+" form. If you wish to address this, please quickly relock the "+sCall1+"s outfit!");
+                }
+                updateRLV2();
+                HeavyLocksMenu();
+            }
+
+            ///////////Speech Menu////////////
+            /////////////////////////////////
+            else if(message=="Speech"){
+                msg=message;
+                menu=12;
+                llSay(iChan,sGroup+" menu 12");
+                SpeechMenu();
+            }
+            else if(message=="Renamer"){
+                llSay(iChan,sGroup+" Lockout 2");
+                textlockout=300;
+                llSetTimerEvent(1);
+                TextListen = llListen(NameChan,"","","");
+                llTextBox(Stored_ID,"Please input a new name for the "+(string)sbimbo+".",NameChan);
+            }
+            else if(message=="Replacer"){
+                llSay(iChan,sGroup+" Lockout 2");
+                textlockout=300;
+                llSetTimerEvent(1);
+                TextListen = llListen(ReplacerChan,"","","");
+                llTextBox(Stored_ID,"What should the "+(string)sbimbo+" REALLY say~♥",ReplacerChan);
+            }
+            else if(message=="CheckRepl"){
+                if(sReplacer==" "){
+                    llRegionSayTo(Stored_ID,0,"The "+(string)sbimbo+" seems to have no replacer and is completely and totally muted~♥");
+                }
+                else{
+                    llRegionSayTo(Stored_ID,0,(string)sReplacer);
+                }
+                SpeechMenu();
+            }
+            else if(message=="Voice"){
+                if(iVoice==0){
+                    iVoice=1;
+                    if(iMuted==1){
+                        sVoice="*Muted*";
+                    }
+                    else{
+                        sVoice="-Stolen-";
+                    }
+                    llOwnerSay("Its time for you to shh, "+(string)sbimbo+".");
+                }
+                else{
+                    iVoice=0;
+                    sVoice="Unmuted";
+                    llOwnerSay("You may now speak, "+(string)sbimbo+".");
+                }
+                SpeechMenu();
+            }
+            else if(message=="Back"){
+                if(menu==12){
+                    menu=11;
+                    llSay(iChan,sGroup+" menu 11");
+                    llDialog(Stored_ID,"Welcome to "+sRenamer+"'s RLV Menu. Be sure to try *all* the locks♥" ,AddBlank(RLV),iChan);
+                }
+                if(menu==21){
+                    menu=12;
+                    llSay(iChan,sGroup+" menu 12");
+                    SpeechMenu();
+                }
+            }
+            else if(message=="GiveKeys"){
+                llSay(iChan,sGroup+" Lockout 2");
+                textlockout=300;
+                llSetTimerEvent(1);
+                TextListen = llListen(OwnerChan,"","","");
+                llTextBox(Stored_ID,"Please input the UUID of the person you wish to own you~ \nIn order to get this, on Firestorm, open your owners profile. In the bottom corner of the window is an arrow. Click this and click Copy UUID. \n\nPaste that down below and submit.",OwnerChan);
+            }
+            if(message=="Confirm"){
+                llSay(iChan,sGroup+" Owner_ID "+(string)Owner_ID);
+                llRegionSayTo(Owner_ID,0,sRenamer+" has given you complete control over "+sPro1+" "+sCoreName);
+                llSay(iChan,sGroup+" Lockout 9");
+            }
+            else{
+                list parts= llParseString2List(message, [" "],[]);
+                if(llList2String(parts,0)==sGroup){
+                    if(llList2String(parts,1)=="menu"){
+                        menu=(integer)llList2String(parts,2);
+                    }
+                    else if(llList2String(parts,1)=="Lock"){
+                        integer Lock=(integer)llList2String(parts,2);
+                        if(Lock==1){
+                            OSay1("Starting up locking routines. Initiating timer. Hold still, little "+sCall2+"♥");
+                            iOutfit=1;
+                            llOwnerSay("@clear");
+                            llSleep(1);
+                            updateRLV1();
+                            llSleep(1);
+                            updateRLV2();
+                            llSleep(1);
+                            updateRLV3();
+                            llSleep(1);
+                            updateSphere();
+                            llSleep(1);
+                            updateRLV1();
+                            llSleep(1);
+                            updateRLV2();
+                            llSleep(1);
+                            updateRLV3();
+                            llSleep(1);
+                            OSay1("Doublechecking locks.. Establishing link with other "+sCall1+"s");
+                            updateSphere();
+                            llSleep(1);
+                            updateRLV1();
+                            llSleep(1);
+                            updateRLV2();
+                            llSleep(1);
+                            updateRLV3();
+                            llSleep(1);
+                            updateSphere();
+                            llSleep(1);
+                            llOwnerSay("@redirchat:"+(string)iChat+"=n");
+                            llOwnerSay("@rediremote:"+(string)iEmote+"=n");
+                            llSleep(1);
+                            OSay1("Locks are fully in place. Do get accustomed with your new life "+sRenamer+". After all you're going to have a long time to enjoy it~♥");
+                        }
+                        else if(Lock==0){
+                            iOutfit=0;
+                            llOwnerSay("@clear");
+                            llSleep(1);
+                            llOwnerSay("@redirchat:"+(string)iChat+"=n");
+                            llSleep(1);
+                            llOwnerSay("@rediremote:"+(string)iEmote+"=n");
+                            llSleep(1);
+                            llOwnerSay("@redirchat:"+(string)iChat+"=n");
+                            llSleep(1);
+                            llOwnerSay("@rediremote:"+(string)iEmote+"=n");
+                        }
+                    }
+                    else if(llList2String(parts,1)=="Stored_ID"){
+                        Stored_ID = llList2String(parts,2);
+                    }
+                }
+            }
+        }
+
+        /////TextBox and other Channels//////
+
+        else if(channel==NameChan){
+            if(message!="Renamer"){
+                sRenamer=message;
+                llSay(iChan,sGroup+" sRenamer "+(string)sRenamer);
+                llRegionSayTo(Stored_ID,0,""+sCall1C+"s name has been changed to "+(string)sRenamer);
+                llOwnerSay("Enjoy your new name, "+(string)sRenamer);
+                iCore=1;
+                Say1("The "+sCall1+" will be referred to as "+sRenamer+" from now on. Please try to not confuse the poor thing with previous names... Thank you.~BunnyCo");
+                llSetTimerEvent(0);
+                llSay(iChan,sGroup+" Lockout 0");
+                llListenRemove(TextListen);
+                SpeechMenu();
+            }
+        }
+        else if(channel==OwnerChan){
+            if(message!="GiveKeys"){
+                Owner_ID=(key)message;
+                llSetTimerEvent(0);
+                llSay(iChan,sGroup+" Lockout 0");
+                llListenRemove(TextListen);
+                ConfirmMenu();
+            }
+        }
+        else if(channel==ReplacerChan){
+            if(message!="Replacer"){
+                sReplacer=message;
+                llSay(iChan,sGroup+" Lockout 0");
+                if(sReplacer=="mute" || sReplacer=="Mute" || sReplacer=="\"Mute\"" || sReplacer=="\"mute\""){
+                    iMuted=1;
+                    llRegionSayTo(Stored_ID,0,"The "+(string)sbimbo+" has been totally muted~ Give "+sPro1+" a good squeak♥");
+                    llOwnerSay("Poor "+(string)sbimbo+", youve been totally silenced~ Now shhhhh♥");
+                }
+                else{
+                    iMuted=0;
+                    llRegionSayTo(Stored_ID,0,"The "+sCall1+"s muted speech has been replaced with, \""+(string)sReplacer+"\"");
+                    llOwnerSay("Your muted speech has been replaced with, \""+(string)sReplacer+"\"");
+                }
+                llSetTimerEvent(0);
+                llListenRemove(TextListen);
+                SpeechMenu();
+            }
+        }
+        else if(channel==iChat){
+            if(message){
+                if(iVoice==1){
+                    if(iMuted==1){
+                        llOwnerSay("Silly "+(string)sbimbo+" you dont have permission to have a voice, remember? Now shhhhhh♥");
+                    }
+                    else{
+                        SayLong((string)sReplacer);
+                    }
+                }
+                else{
+                    SayLong((string)message);
+                }
+            }
+        }
+        else if(channel==iEmote){
+                if(message){
+                    SayLong((string)message);
+                }
+        }
+    }
+    timer()
+    {
+        textlockout--;
+        if(textlockout==0){
+            llSay(iChat,sGroup+" Lockout 9");
+            llListenRemove(TextListen);
+            llSetTimerEvent(0);
+        }
+    }
+}
