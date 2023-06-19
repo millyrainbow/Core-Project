@@ -1,0 +1,324 @@
+////////////////////////////////////////////////////////////
+///////////////////////TIMERCORE/////////////////////////////
+//////////////////For <Insert Here>//////////////////////////
+////////////////////////////////////////////////////////////
+//              Coded by Emily Mewens                    //
+//////////////////////////////////////////////////////////
+
+string sGroup = "Example Group Name";
+//This is the group tag used to talk with all other scripts in the same group. Make sure they all have the same group tag
+string sCoreName = "Example Core Name";
+//this is what you want your core to be referred to in ownersay and say
+string sCall1 = "example call name";
+string sCall1C = "Example call name";
+string sCall2 = "example call2";
+string sCall3 = "example call3";
+//These are various calls used in the menus and various says when referring to you. sCall1C is for capital letterings cause im lazy.
+string sPro1    =   "example pronoun for it";
+string sPro2    =   "example pronoun for its";
+//These are for pronouns. Pro1 is for it, he, her, them. Pro2 is for its, his, hers, their.
+
+integer defaulttime = 86400;
+//defaulttime is what the timer will be set when locked. Default is 3600, or 1 hour.43200 12 hours
+integer timecap = 2419200;
+//This last integer is for the timercap. This prevents your timer from going over the alotted time. Default is 1209600, or 2 weeks.
+string RTime(){
+    return (string)clockify(timelock);
+}
+list MenuDialog(){
+    list dialog = [];
+    //    if(Stored_ID==Marcella||(Stored_ID==Emily&&llGetOwner()==Marcella)||Stored_ID==llGetOwner()){
+    return ["+1 hour", "+5 hours","+12 hours","+1 day"," ","-1 hour",Locker(Lock)," ","Back"];
+    //    }
+    //    else{
+    //        return ["+1 hour", "+5 hours","+12 hours","+1 day"," ","-1 hour"," "," ","Back"];
+    //    }
+    //This is the timelock buttons. Use these to increase or decrease time. All you need to do is apply + or - (time) (time measurement). The timer will only recognize seconds up to weeks.
+    //Example: ["-20 days","+16 weeks","+1 second"];
+    //Note that there are two sets that you can change. The top set is for when the default timer runs out, and additiona tine was added. And the bottom one is for when the default timer has not run out, preventing people from unlocking you until the default timer is over.
+}
+string Locker(integer bool){
+    if(bool)return" ";
+    else return"Lock";
+}
+TimeDiag(){
+    llDialog(Stored_ID,"This is "+sRenamer+"'s Timer. To lock "+sPro1+" tight, youll need to add a bunch of time to "+sPro2+" timer, and then click Lock!:\n"+RTime(),AddBlank(MenuDialog()),iChan);
+}
+string MEN_BLANK    = " ";
+//---------------------------------------------//
+//Overly Complex system to add the correct number
+//of blank spots to a menu
+list AddBlank(list lst)
+{
+    list templist;
+    integer num = llGetListLength(lst)%3;
+
+    if     (num == 1){templist += [MEN_BLANK,MEN_BLANK];}
+    else if(num == 2){templist += [MEN_BLANK];}
+
+    list bset1 = llList2List(lst,0,2 );
+    list bset2 = llList2List(lst,3,5 );
+    list bset3 = llList2List(lst,6,8 );
+    list bset4 = llList2List(lst,9,11);
+
+    if     (bset2 == []){return bset1+templist;}
+    else if(bset3 == []){return bset2+templist+bset1;}
+    else if(bset4 == []){return bset3+templist+bset2+bset1;}
+    else                {return bset4+templist+bset3+bset2+bset1;}
+}
+///////////////////////////////////////////////
+string clockify(integer time){
+    integer seconds = time;
+    integer minutes = 0;
+    integer hours = 0;
+    integer days = 0;
+    while(seconds > 60){
+        seconds -= 60;
+        minutes += 1;
+    }
+    while(minutes > 60){
+        minutes -= 60;
+        hours+= 1;
+    }
+    while(hours > 24){
+        hours -= 24;
+        days+=1;
+    }
+
+    string dayString;
+    if(days < 10)dayString = "0"+(string)days;
+    else dayString = (string)days;
+    string hourString;
+    if(hours < 10)hourString = "0"+(string)hours;
+    else hourString = (string)hours;
+    string minuteString;
+    if(minutes < 10)minuteString = "0"+(string)minutes;
+    else minuteString = (string)minutes;
+    string secondString;
+    if(seconds < 10)secondString = "0"+(string)seconds;
+    else secondString = (string)seconds;
+    return dayString+":"+hourString+":"+minuteString+":"+secondString;
+}
+
+
+Say2(string nachos)
+{
+    string objname = llGetObjectName();
+    llSetObjectName(sRenamer);
+    llSay(0,nachos);
+    llSetObjectName(objname);
+}
+OSay(string sOSay1)
+{
+    string ObjectName = llGetObjectName();
+    llSetObjectName("BunnyCo");
+    llOwnerSay(sOSay1);
+    llSetObjectName(ObjectName);
+}
+OSay2(string sOSay1)
+{
+    string ObjectName = llGetObjectName();
+    llSetObjectName("Whispers");
+    llOwnerSay(sOSay1);
+    llSetObjectName(ObjectName);
+}
+
+integer chan1;
+integer iChan;
+integer DEBUG;
+
+integer Lock=0;
+integer timelock = 0;
+integer lastUnix;
+integer time;
+integer positive;
+
+
+
+integer phrasetimer=30;
+integer phrasetime=600;
+integer phrases;
+
+
+string sRenamer;
+string sNotecard = "PhraseList";
+
+
+key Stored_ID;
+//key Marcella = "1725939c-b807-466c-a163-b0cd447f6670";
+//key Marcella = "8df7f681-9ca9-4e38-964a-5f89673d1c7e";
+//key Emily = "6198bba5-0235-40a8-b1f5-210ca3ece420";
+key kLines;
+key kRead;
+integer iLines;
+
+integer menu;
+//Menu 0-10 = HomeCore
+//Menu 11-20 = RLVCore
+//Menu 21-30 = Hovercore
+//Menu 31-40 = Timercore
+
+CapCheck(){
+    if(timelock>timecap){
+        timelock=timecap;
+    }
+}
+
+default
+{
+    state_entry()
+    {
+        chan1 = (integer) ("0x"+llGetSubString((string)llGetOwner(), -9, -3));
+        iChan = chan1+80;
+        DEBUG = 6789;
+        llListen(iChan,"","","");
+        llListen(DEBUG,"","","");
+        Lock=0;
+        phrases=1;
+        lastUnix = llGetUnixTime();
+    }
+    changed(integer change)
+    {
+        if (change & CHANGED_OWNER) //note that it's & and not &&... it's bitwise!
+        {
+            llResetScript(); // needs a reset if the owner is changed to ensure that if you give it to someone else the listeners are reset.
+        }
+    }
+    listen(integer chan, string name, key id, string msg)
+    {
+        if(chan==DEBUG){
+            if(msg=="Unlock"){
+                timelock = 5;
+            }
+        }
+
+
+        if(chan==iChan){
+            string sign = llGetSubString(msg,0,0);
+            if(msg=="Timer"){
+                menu=31;
+                llSay(iChan,sGroup+" menu 31");
+                TimeDiag();
+            }
+            else if(msg=="5 min"){
+                phrasetimer=5;
+                phrasetime=300;
+            }
+            else if(msg=="10 min"){
+                phrasetimer=5;
+                phrasetime=600;
+            }
+            else if(msg=="Lock"){
+                llSay(iChan,sGroup+" Lock 1");
+                if(timelock==0){
+                    timelock=defaulttime;
+                }
+                kLines = llGetNumberOfNotecardLines(sNotecard);
+                Lock=1;
+                Say2(sRenamer+" shudders and moans as "+sPro2+" form slowly creeeaks and squiirks more and more as what seems to be "+sPro2+" skin pulls tighter and tighter.. the poor "+sCall2+" shaking "+sPro2+" head before trembling greatly.. "+sPro2+" hips giving a soft buck or two as "+sPro1+" squirms in blissful excitement");
+                llSetTimerEvent(1);
+            }
+            else if(sign == "+" || sign == "-"){
+                list cmd = llParseString2List(llGetSubString(llToLower(msg),1,-1),[" "],[]);
+                time = (integer)llList2String(cmd,0);
+                if(sign == "+") positive = 1;
+                if(sign == "-") positive = -1;
+                string multiplier = llList2String(cmd,1);
+                if(time && multiplier != ""){
+                    if(multiplier == "day" || multiplier == "days"){
+                        timelock += (time*86400)*positive;
+                    }
+                    if(multiplier == "hour" || multiplier == "hours"){
+                        timelock += (time*3600)*positive;
+                    }
+                    if(multiplier == "week" || multiplier == "weeks"){
+                        timelock += (time*604800)*positive;
+                    }
+                    if(multiplier == "month" || multiplier == "months"){
+                        timelock += (time*2419200)*positive;
+                    }
+                    if(multiplier == "year" || multiplier == "years"){
+                        timelock += (time*29030400)*positive;
+                    }
+                    if(sign == "+"){
+                        llOwnerSay(llGetDisplayName(id)+" added "+msg);
+                        llRegionSayTo(id,0,"Added "+msg);
+                    }else if(sign == "-"){
+                            llOwnerSay(llGetDisplayName(id)+" removed "+msg);
+                        llRegionSayTo(id,0,"Removed "+msg);
+                    }if(timelock>=timecap){
+                            timelock = timecap;
+                    }
+                }
+                TimeDiag();
+            }
+            else{
+                list parts= llParseString2List(msg, [" "],[]);
+                if(llList2String(parts,0)==sGroup){
+                    if(llList2String(parts,1)=="sRenamer"){
+                        list parts2 = llDeleteSubList(parts,0,1);
+                        sRenamer = llDumpList2String(parts2," ");
+                    }
+                    else if(llList2String(parts,1)=="Stored_ID"){
+                        Stored_ID=llList2String(parts,2);
+                    }
+                    else if(llList2String(parts,1)=="Phrases"){
+                        if(llList2String(parts,2)=="TRUE"){
+                            phrases=1;
+                        }
+                        else{
+                            phrases=0;
+                        }
+                    }
+                    else if(llList2String(parts,1)=="menu"){
+                        menu=(integer)llList2String(parts,2);
+                    }
+                    //                    else if(Stored_ID
+                    //                    }
+                }
+            }
+        }
+    }
+    timer(){
+        if(timelock>0){
+            llSetText("Lock time remaning: "+(string)clockify(timelock),<1,1,1>,1);
+        }
+        //This is the timers hover text.
+        timelock -= llGetUnixTime()-lastUnix;
+        if(timelock <= 0){
+            Lock = 0;
+            OSay("Seems like your time is up, little "+sCall1+", you should hurry and get yourself relocked, like the good "+sCall2+" you are♥\n\nAll of your bindings may have been temporarily disabled, but all you'd need do is add some time and click that lovely lock button, and youll get to enjoy your life as a very good "+sCall1+", and all your wonderful locks will slip right back into place, just as things should be~♥\nBunnyCo");
+            Say2("/me "+sRenamer+" has been unlocked. Hurry and click "+sPro2+" button to see if you can restart "+sPro2+" timer!");
+            //What it says when the timer ends
+            llSay(iChan,sGroup+" Lock 0");
+            llSetTimerEvent(0);
+            timelock = 0;
+            llSetText(" ",<1,1,1>,0);
+            //This is the hover text for when you arent locked
+        }
+        if(phrases==1){
+            if(phrasetimer<=0){
+                phrasetimer=phrasetime;
+                    kRead= llGetNotecardLine(sNotecard, llFloor((integer)llFrand((integer)iLines)));
+                }
+            }
+            if(phrasetimer>0){
+                phrasetimer--;
+            }
+        lastUnix = llGetUnixTime();
+    }
+    dataserver( key queryid, string data )
+    {
+        if(queryid==kLines){
+            iLines = (integer)data;
+        }
+        if(queryid==kRead){
+            if(data==EOF){
+                llOwnerSay("Error: The notecard is blank");
+            }
+            else{
+                OSay2(data);
+            }
+        }
+    }
+}
