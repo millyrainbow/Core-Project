@@ -1,0 +1,35 @@
+/////////////////////////////////////////////////////////////////
+//////////////////<Insert Here> Toucher CORE//////////////////////
+///////////////////////////////////////////////////////////////////
+//                      Coded By Emily Mewens                     //
+/////////////////////////////////////////////////////////////////////
+
+string sGroup = "Example Group Name";
+//This is the group tag used to talk with all other scripts in the same group. Make sure they all have the same group tag
+
+integer chan1;
+integer iChan;
+integer iBounce;
+key Stored_ID;
+default
+{
+    state_entry()
+    {
+        chan1 = (integer) ("0x"+llGetSubString((string)llGetOwner(), -9, -3));
+        iChan = chan1+80;
+        iBounce = iChan+7;
+    }
+
+    touch_start(integer total_number)
+    {
+        Stored_ID=llDetectedKey(0);
+        llSay(iBounce,sGroup+" TStored_ID "+(string)Stored_ID);
+    }
+    changed(integer change)
+    {
+        if (change & CHANGED_OWNER) //note that it's & and not &&... it's bitwise!
+        {
+            llResetScript(); // needs a reset if the owner is changed to ensure that if you give it to someone else the listeners are reset.
+        }
+    }
+}
