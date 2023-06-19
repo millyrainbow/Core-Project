@@ -1,0 +1,213 @@
+////////////////////////////////////////////////////////////
+////////////////////////HOVERCORE///////////////////////////
+////////////////////FOR <Insert Here>///////////////////////
+///////////////////////////////////////////////////////////
+//                Coded by Emily Mewens                  //
+////////////////////////////////////////////////////////////
+
+string sGroup = "Example Group Name";
+//This is the group tag used to talk with all other scripts in the same group. Make sure they all have the same group tag
+string sCoreName = "Example Core Name";
+//this is what you want your core to be referred to in ownersay and say
+string sCall1 = "example call name";
+string sCall1C = "Example call name";
+string sCall2 = "example call2";
+string sCall3 = "example call3";
+//These are various calls used in the menus and various says when referring to you. sCall1C is for capital letterings cause im lazy.
+string sPro1    =   "example pronoun for it";
+string sPro2    =   "example pronoun for its";
+//These are for pronouns. Pro1 is for it, he, her, them. Pro2 is for its, his, hers, their.
+
+string sHText = "Example Default Hovertext";
+//What your default  hovertext is set to.
+
+//---------------------------------------------//
+string MEN_BLANK    = " ";
+//---------------------------------------------//
+//Overly Complex system to add the correct number
+//of blank spots to a menu
+list AddBlank(list lst)
+{
+    list templist;
+    integer num = llGetListLength(lst)%3;
+
+    if     (num == 1){templist += [MEN_BLANK,MEN_BLANK];}
+    else if(num == 2){templist += [MEN_BLANK];}
+
+    list bset1 = llList2List(lst,0,2 );
+    list bset2 = llList2List(lst,3,5 );
+    list bset3 = llList2List(lst,6,8 );
+    list bset4 = llList2List(lst,9,11);
+
+    if     (bset2 == []){return bset1+templist;}
+    else if(bset3 == []){return bset2+templist+bset1;}
+    else if(bset4 == []){return bset3+templist+bset2+bset1;}
+    else                {return bset4+templist+bset3+bset2+bset1;}
+}
+
+list HoverText;
+list HoverTextO    =    ["Change Text", "Color", "Off", " ", "Back"];
+list HoverTextI    =    ["Change Text", "Color", "On", " ", "Back"];
+list Colors        =    ["Red", "Pink", "Purple", "Blue", "Cyan", "Green", "Yellow", "Orange", "Back"];
+HoverDiag(){
+    llDialog(Stored_ID,(string)sHIO+"\n\nCurrent HoverText: "+(string)sHText+"\nCurrent HoverText Color: "+(string)sHColor+"\n\nHere you can change the settings for the text that hovers over the "+sCall1+"s cute little head",AddBlank(HoverText),iChan);
+}
+ColorDiag(){
+    llDialog(Stored_ID,"Here you can change the color for the hover text",AddBlank(Colors),iChan);
+}
+integer iChan;
+integer chan1;
+integer TextChan;
+//integer iBounce;
+//integer iNeed;
+integer TextListen;
+
+integer menu;
+//Menu 0-10 = HomeCore
+//Menu 11-20 = RLVCore
+//Menu 21-30 = Hovercore
+//Menu 31-40 = Timercore
+
+
+string sHColor = "Pink";
+string sHIO = "HoverText is currently On";
+vector vHColor = <1,0.5,1>;
+float fHIO=1;
+
+key Stored_ID;
+//key Marcella = "8df7f681-9ca9-4e38-964a-5f89673d1c7e";
+//key Marcella = "1725939c-b807-466c-a163-b0cd447f6670";
+
+default
+{
+    state_entry()
+    {
+        chan1 = (integer) ("0x"+llGetSubString((string)llGetOwner(), -9, -3));
+        iChan=chan1+80;
+        TextChan = iChan+6;
+        //        iBounce = iChan+7;
+        //        iNeed = iChan+8;
+        llListen(iChan,"","","");
+        HoverText = HoverTextO;
+        llSetText(sHText,vHColor,fHIO);
+    }
+    changed(integer change)
+    {
+        if (change & CHANGED_OWNER) //note that it's & and not &&... it's bitwise!
+        {
+            llResetScript(); // needs a reset if the owner is changed to ensure that if you give it to someone else the listeners are reset.
+        }
+    }
+    listen(integer chan, string name, key id, string msg)
+    {
+        if(chan==iChan){
+            if(msg=="Hovertext"){
+                menu=21;
+                llSay(iChan,sGroup+" menu 21");
+                HoverDiag();
+                llListenRemove(TextListen);
+            }
+            else if(msg=="Change Text"){
+                TextListen = llListen(TextChan,"","","");
+                llTextBox(Stored_ID,"Try to keep it short. You can input line breaks by using \\n",TextChan);
+            }
+            else if(msg=="Color"){
+                menu=22;
+                llSay(iChan,sGroup+" menu 22");
+                ColorDiag();
+            }
+            else if(msg=="Red"){
+                vHColor=<1,0.3,0.3>;
+                sHColor="Red";
+                llSetText(sHText,vHColor,fHIO);
+                ColorDiag();
+            }
+            else if(msg=="Pink"){
+                vHColor=<1,0.5,1>;
+                sHColor="Pink";
+                llSetText(sHText,vHColor,fHIO);
+                ColorDiag();
+            }
+            else if(msg=="Purple"){
+                vHColor=<0.8,0.3,1>;
+                sHColor="Purple";
+                llSetText(sHText,vHColor,fHIO);
+                ColorDiag();
+            }
+            else if(msg=="Blue"){
+                vHColor=<0.4,0.4,1>;
+                sHColor="Blue";
+                llSetText(sHText,vHColor,fHIO);
+                ColorDiag();
+            }
+            else if(msg=="Cyan"){
+                vHColor=<0,1,1>;
+                sHColor="Cyan";
+                llSetText(sHText,vHColor,fHIO);
+                ColorDiag();
+            }
+            else if(msg=="Green"){
+                vHColor=<0,1,0>;
+                sHColor="Green";
+                llSetText(sHText,vHColor,fHIO);
+                ColorDiag();
+            }
+            else if(msg=="Yellow"){
+                vHColor=<1,1,0>;
+                sHColor="Yellow";
+                llSetText(sHText,vHColor,fHIO);
+                ColorDiag();
+            }
+            else if(msg=="Orange"){
+                vHColor=<1,0.5,0>;
+                sHColor="Orange";
+                llSetText(sHText,vHColor,fHIO);
+                ColorDiag();
+            }
+            else if(msg=="Off"){
+                if(menu==21){
+                    HoverText=HoverTextI;
+                    sHIO="HoverText is turned off.";
+                    fHIO=0;
+                    llSetText(sHText,vHColor,fHIO);
+                    HoverDiag();
+                }
+            }
+            else if(msg=="On"){
+                if(menu==21){
+                    HoverText=HoverTextO;
+                    sHIO="HoverText is active.";
+                    fHIO=1;
+                    llSetText(sHText,vHColor,fHIO);
+                    HoverDiag();
+                }
+            }
+            else if(msg=="Back"){
+                if(menu==22){
+                    menu=21;
+                    llSay(iChan,sGroup+" menu 21");
+                    HoverDiag();
+                }
+            }
+            else{
+                list parts= llParseString2List(msg, [" "],[]);
+                if(llList2String(parts,0)==sGroup){
+                    if(llList2String(parts,1)=="Stored_ID"){
+                        Stored_ID=llList2String(parts,2);
+                    }
+                    if(llList2String(parts,1)=="menu"){
+                        menu=(integer)llList2String(parts,3);
+                    }
+                }
+            }
+        }
+        else if(chan==TextChan){
+            if(msg!="Change_Text"){
+                sHText = msg;
+                llSetText(sHText,vHColor,fHIO);
+                llListenRemove(TextListen);
+                HoverDiag();
+            }
+        }
+    }
+}
